@@ -41,27 +41,31 @@ app.post("/login", (req, res) => {
   console.log(req.body);
   var email = req.body.email;
   var pass = req.body.password;
-  db.query(
-    `SELECT password FROM test WHERE email = '${email}'`,
-    (err, result) => {
-      if (err) throw err;
-      var phash = result[0].password;
-      var p = pass;
-      bcrypt.compare(p, phash, function (err, result) {
+  if (pass !== null && pass !== undefined) {
+    db.query(
+      `SELECT password FROM test WHERE email = '${email}'`,
+      (err, result) => {
         if (err) throw err;
-        if (result) {
-          console.log(`user ${email} logged in`);
-          return res.json({
-            token: jsonwebtoken.sign({ user: `${email}` }, JWT_SECRET),
-          });
-        }
-        if (!result) {
-          console.log("nu e mucho buenos");
-          res.send("nu e bine ...");
-        }
-      });
-    }
-  );
+        var phash = result[0].password;
+        var p = pass;
+        bcrypt.compare(p, phash, function (err, result) {
+          if (err) throw err;
+          if (result) {
+            console.log(`user ${email} logged in`);
+            return res.json({
+              token: jsonwebtoken.sign({ user: `${email}` }, JWT_SECRET),
+            });
+          }
+          if (!result) {
+            console.log("nu e mucho buenos");
+            res.send("nu e bine ...");
+          }
+        });
+      }
+    );
+  } else {
+    res.send({ error: "parola gresita" });
+  }
 });
 
 app.post("/register", (req, res) => {
