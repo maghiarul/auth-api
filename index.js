@@ -16,24 +16,6 @@ app.get("/", (req, res) => {
     res.send(result);
   });
 });
-
-// app.post("/login", (req, res) => {
-//   db.query(
-//     "SELECT password FROM test WHERE email = 'cristi@gmail.com'",
-//     (err, result) => {
-//       if (err) throw err;
-//       var hash = result[0].password;
-//       var plaintextPassword = "cristi01";
-//       bcrypt.compare(plaintextPassword, hash, function (err, result) {
-//         if (err) throw err;
-//         if (result) {
-//           // password is valid
-//           console.log("valid af");
-//         }
-//       });
-//     }
-//   );
-// });
 const JWT_SECRET =
   "apiohdpioahfpoisaop;eifhjpro9euighpoij0981u4-098u1349ihjn;okwsnef09u1=-092uklm";
 
@@ -51,20 +33,20 @@ app.post("/login", (req, res) => {
         bcrypt.compare(p, phash, function (err, result) {
           if (err) throw err;
           if (result) {
-            console.log(`user ${email} logged in`);
+            console.log(`User ${email} logged in`);
             return res.json({
               token: jsonwebtoken.sign({ user: `${email}` }, JWT_SECRET),
             });
           }
           if (!result) {
-            console.log("nu e mucho buenos");
-            res.send("nu e bine ...");
+            res.status(400);
           }
         });
       }
     );
   } else {
-    res.send({ error: "parola gresita" });
+    res.status(401);
+    res.send({ error: "Wrong password" });
   }
 });
 
@@ -73,11 +55,17 @@ app.post("/register", (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
   bcrypt.hash(pass, 10, function (err, hash) {
+    if (err) {
+      res.status(400);
+      res.send("Something happened... :/");
+      throw err;
+    }
     db.query(
       `INSERT INTO test (email, password) VALUES ('${email}', '${hash}')`,
       (err, result) => {
         if (err) throw err;
-        console.log("register complete");
+        res.status(200);
+        res.send("Added succesfully !");
       }
     );
   });
