@@ -7,20 +7,23 @@ var bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 
+const PORT = 3001;
+
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
-  db.query("SELECT * FROM test", (err, result) => {
-    if (err) throw err;
-    res.send(result);
-  });
-});
+// gets all the accounts from the database
+
+// app.get("/", (req, res) => {
+//   db.query("SELECT * FROM test", (err, result) => {
+//     if (err) throw err;
+//     res.send(result);
+//   });
+// });
 const JWT_SECRET =
   "apiohdpioahfpoisaop;eifhjpro9euighpoij0981u4-098u1349ihjn;okwsnef09u1=-092uklm";
 
 app.post("/login", (req, res) => {
-  console.log(req.body);
   var email = req.body.email;
   var pass = req.body.password;
   if (pass !== null && pass !== undefined) {
@@ -40,6 +43,7 @@ app.post("/login", (req, res) => {
           }
           if (!result) {
             res.status(400);
+            console.log("Wrong password !")
           }
         });
       }
@@ -51,7 +55,6 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(req.body);
   var email = req.body.email;
   var pass = req.body.password;
   bcrypt.hash(pass, 10, function (err, hash) {
@@ -71,6 +74,6 @@ app.post("/register", (req, res) => {
   });
 });
 
-app.listen(3001, () => {
-  console.log("App running on port 3001");
+app.listen(PORT, () => {
+  console.log(`App running on port ${PORT}`);
 });
