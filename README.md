@@ -1,3 +1,3 @@
-# auth-api v1.2.3
+# auth-api v1.4
 
-## small bug fixes
+### 1. added connection to the /products table inside the db

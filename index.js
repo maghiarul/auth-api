@@ -39,11 +39,13 @@ app.post("/login", (req, res) => {
             console.log(`User ${email} logged in`);
             return res.json({
               token: jsonwebtoken.sign({ user: `${email}` }, JWT_SECRET),
+              success: true,
             });
           }
           if (!result) {
-            res.status(400);
-            console.log("Wrong password !")
+            return res.json({
+              success: false,
+            });
           }
         });
       }
@@ -72,6 +74,17 @@ app.post("/register", (req, res) => {
       }
     );
   });
+});
+
+app.post("/products", (req, res) => {
+  var email = req.body.email;
+  db.query(
+    `SELECT * FROM products WHERE product_vendor IN (SELECT email FROM test WHERE email = '${email}')`,
+    (err, result) => {
+      res.send(result);
+    }
+    // once done with the request this will be the good query
+  );
 });
 
 app.listen(PORT, () => {
