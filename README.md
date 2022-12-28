@@ -1,3 +1,3 @@
-# auth-api v1.4
+# auth-api v1.4.1
 
-### 1. added connection to the /products table inside the db
+### 1. made routes for /delete and /create.

@@ -87,6 +87,24 @@ app.post("/products", (req, res) => {
   );
 });
 
+app.post("/delete", (req, res) => {
+  var id = req.body.id;
+  console.log(id);
+  db.query(`DELETE products FROM products WHERE id = ${id}`, (err, result) => {
+    res.send(result);
+  });
+});
+
+app.post("/create", (req, res) => {
+  var name = req.body.product_name;
+  var price = req.body.product_price;
+  var vendor = req.body.product_vendor;
+  db.query(`INSERT INTO products (product_name, product_price, product_vendor) VALUES ('${name}', '${price}', '${vendor}')`, (err, result)=>{
+    res.status(200)
+    res.send("Product added successfully !")
+  })
+});
+
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}`);
 });
