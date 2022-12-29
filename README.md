@@ -1,3 +1,3 @@
-# auth-api v1.4.1
+# auth-api v1.5
 
-### 1. made routes for /delete and /create.
+### i'm too lazy to write all the changes, but it's all good

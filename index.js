@@ -7,10 +7,11 @@ var bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 
-const PORT = 3001;
+const PORT = 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // gets all the accounts from the database
 
@@ -26,23 +27,24 @@ const JWT_SECRET =
 app.post("/login", (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
-  if (pass !== null && pass !== undefined) {
+  if (email !== "" && pass !== "") {
     db.query(
       `SELECT password FROM test WHERE email = '${email}'`,
       (err, result) => {
-        if (err) throw err;
         var phash = result[0].password;
         var p = pass;
         bcrypt.compare(p, phash, function (err, result) {
-          if (err) throw err;
           if (result) {
-            console.log(`User ${email} logged in`);
+            res.status(200);
+            // Logged in correctly
             return res.json({
               token: jsonwebtoken.sign({ user: `${email}` }, JWT_SECRET),
               success: true,
             });
           }
           if (!result) {
+            // No account found
+            res.status(401);
             return res.json({
               success: false,
             });
@@ -51,29 +53,34 @@ app.post("/login", (req, res) => {
       }
     );
   } else {
-    res.status(401);
-    res.send({ error: "Wrong password" });
+    res.status(404);
   }
 });
+
+// ┻┳|
+// ┳┻| _
+// ┻┳| •.•)
+// ┳┻|⊂ﾉ
+// ┻┳|
 
 app.post("/register", (req, res) => {
   var email = req.body.email;
   var pass = req.body.password;
-  bcrypt.hash(pass, 10, function (err, hash) {
-    if (err) {
-      res.status(400);
-      res.send("Something happened... :/");
-      throw err;
-    }
-    db.query(
-      `INSERT INTO test (email, password) VALUES ('${email}', '${hash}')`,
-      (err, result) => {
-        if (err) throw err;
-        res.status(200);
-        res.send("Added succesfully !");
+  if (email !== "" && pass !== "") {
+    bcrypt.hash(pass, 10, function (err, hash) {
+      if (err) {
+        res.status(501);
       }
-    );
-  });
+      db.query(
+        `INSERT INTO test (email, password) VALUES ('${email}', '${hash}')`,
+        (err, result) => {
+          res.status(200);
+        }
+      );
+    });
+  } else {
+    res.status(403);
+  }
 });
 
 app.post("/products", (req, res) => {
@@ -87,9 +94,14 @@ app.post("/products", (req, res) => {
   );
 });
 
+app.get("/product-list", (req, res) => {
+  db.query("SELECT * FROM products", (err, result) => {
+    res.send(result);
+  });
+});
+
 app.post("/delete", (req, res) => {
   var id = req.body.id;
-  console.log(id);
   db.query(`DELETE products FROM products WHERE id = ${id}`, (err, result) => {
     res.send(result);
   });
@@ -99,11 +111,15 @@ app.post("/create", (req, res) => {
   var name = req.body.product_name;
   var price = req.body.product_price;
   var vendor = req.body.product_vendor;
-  db.query(`INSERT INTO products (product_name, product_price, product_vendor) VALUES ('${name}', '${price}', '${vendor}')`, (err, result)=>{
-    res.status(200)
-    res.send("Product added successfully !")
-  })
+  db.query(
+    `INSERT INTO products (product_name, product_price, product_vendor) VALUES ('${name}', '${price}', '${vendor}')`,
+    (err, result) => {
+      res.status(200);
+    }
+  );
 });
+
+// ¯\_(ツ)_/¯
 
 app.listen(PORT, () => {
   console.log(`App running on port ${PORT}`);
