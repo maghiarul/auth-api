@@ -1,3 +1,3 @@
-# auth-api v1.5
+# auth-api v1.5.2
 
-### i'm too lazy to write all the changes, but it's all good
+### ordered products list ascending by name

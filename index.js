@@ -95,7 +95,7 @@ app.post("/products", (req, res) => {
 });
 
 app.get("/product-list", (req, res) => {
-  db.query("SELECT * FROM products", (err, result) => {
+  db.query("SELECT * FROM `products` ORDER BY product_name ASC", (err, result) => {
     res.send(result);
   });
 });
